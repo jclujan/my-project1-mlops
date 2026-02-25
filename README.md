@@ -157,3 +157,150 @@ The full machine learning pipeline will eventually be executable through:
 
 
 
+# 6. Business Canvas
+
+## Client
+
+Real Estate Agency / Property Valuation Firm  
+
+Industry: Real Estate & Financial Services  
+
+---
+
+## Business Unit
+
+- Property Valuation  
+- Sales Strategy  
+- Investment Analysis  
+
+---
+
+## Client Maturity
+
+- Structured housing data available  
+- Spreadsheet-based pricing workflow  
+- Manual appraisal processes  
+- Limited automation  
+- Strong interest in analytics-driven valuation  
+
+---
+
+## Problem Statement
+
+Current pricing relies heavily on:
+
+- Manual valuation  
+- Comparable property heuristics  
+- Subjective experience  
+
+### Pain Points
+
+- Inconsistent pricing  
+- Bias in high-end property estimates  
+- Time-consuming valuation process  
+- Missed revenue opportunities  
+
+---
+
+## Goal (Quantifiable KPI)
+
+- Validation R² ≥ 0.88  
+- Reduced pricing variance  
+- Faster listing preparation  
+- Improved pricing consistency  
+
+---
+
+## Solution Description & Key Functionalities
+
+A scalable machine learning valuation engine that:
+
+- Cleans and preprocesses structured housing data  
+- Identifies key value drivers  
+- Produces automated sale price predictions  
+- Ensures reproducible and modular MLOps pipeline execution  
+
+### Future Extensions
+
+- REST API deployment  
+- Real-time pricing dashboard  
+- Multi-region training framework  
+
+---
+
+## Solution Scalability
+
+### Short-Term
+- Production model for Ames  
+
+### Mid-Term
+- Expand to Iowa statewide data  
+- Incorporate regional economic indicators  
+
+### Long-Term
+- Nationwide automated valuation engine  
+- Integration with real estate listing platforms  
+- Continuous retraining and monitoring  
+
+---
+
+## Client Benefits (vs Non-AI Approach)
+
+### Tangible Benefits
+
+- Higher pricing accuracy  
+- Reduced manual workload  
+- Faster time-to-market  
+- More consistent pricing strategy  
+
+### Intangible Benefits
+
+- Data-driven credibility  
+- Competitive advantage  
+- Scalable analytics infrastructure  
+
+### Measured By
+
+- Reduced prediction error  
+- Improved R²  
+- Reduced listing cycle time  
+
+---
+
+## Cost Estimation (Ballpark)
+
+### Talent Requirements
+
+- AI Specialist  
+- ML Engineer  
+- Data Engineer  
+- Product Manager  
+- Real Estate Subject Matter Expert  
+
+Estimated development phase: **12+ weeks**
+
+Estimated pilot budget: **$60k – $120k**
+
+### Client Responsibilities
+
+- Data infrastructure  
+- Cloud compute  
+- Deployment environment  
+
+---
+
+## Risks & Mitigation
+
+### Risks
+
+- Limited generalization beyond Ames  
+- Bias at price extremes  
+- Data quality variations across regions  
+- Model drift over time  
+
+### Mitigation
+
+- Continuous monitoring of residuals  
+- Scheduled retraining  
+- Bias audits  
+- Geographic data expansion  
