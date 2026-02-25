@@ -1,42 +1,116 @@
-# [Project Name: e.g., Retail Sales Forecasting]
+# 🏠 Smart Residential Price Estimation  
+### Production-Grade House Price Prediction – Ames, Iowa  
 
-**Author:** TODO_STUDENT (Your Group Name or number)  
-**Course:** MLOps: Master in Business Analytics and Data Sciense
-**Status:** Session 1 (Initialization)
-
----
-
-## 1. Business Objective
-*Replace this section with your project definition.*
-
-* **The Goal:** What business value does this model create?
-  > *Example: Reduce food waste by 10% by predicting daily bakery demand.*
-
-* **The User:** Who consumes the output and how?
-  > *Example: Store managers receive a weekly PDF report on Monday mornings.*
+**Authors:** Group 3 – Juan Camilo Luján, Laurenz Jakob, Raluca Gogosoiu, Silvia Mendoza & Stephan Pentchev  
+**Course:** MLOps – Master in Business Analytics and Data Science  
+**Status:** Production Refactoring Phase  
 
 ---
 
-## 2. Success Metrics
-*How do we know if the project is successful?*
+# 1. Business Objective
 
-* **Business KPI (The "Why"):**
-  > *Example: Reduce unsold inventory costs by $5,000/month.*
+## The Goal
 
-* **Technical Metric (The "How"):**
-  > *Example: Model MAPE (Mean Absolute Percentage Error) < 15% on the test set.*
+Develop a scalable machine learning system that accurately predicts residential house sale prices using structured property data.
 
-* **Acceptance Criteria:**
-  > *Example: The model must outperform the current "moving average" baseline.*
+The solution aims to:
+
+- Improve valuation accuracy  
+- Reduce reliance on manual appraisal heuristics  
+- Provide consistent, data-driven pricing  
+- Enable scalable deployment from Ames (Iowa) to state-wide and eventually nationwide markets  
+
+The long-term vision is to build a fully automated housing valuation engine for real estate agencies, lenders, and investors.
 
 ---
 
-## 3. The Data
+## The User
 
-* **Source:** (e.g., Company Database, Kaggle CSV, API).
-* **Target Variable:** What specifically are you predicting/ classifying?
-* **Sensitive Info:** Are there emails, credit cards, or any PII (Personally Identifiable Information)?
-  > *⚠️ **WARNING:** If the dataset contains sensitive data, it must NEVER be committed to GitHub. Ensure `data/` is in your `.gitignore`.*
+Primary users:
+
+- Real estate agencies  
+- Mortgage lenders  
+- Property investors  
+- Individual sellers  
+
+Outputs:
+
+- Automated sale price predictions  
+- Evaluation reports  
+- Scalable production-ready pipeline  
+
+---
+
+# 2. Success Metrics
+
+## Business KPI (The “Why”)
+
+- Reduce pricing error compared to manual estimation  
+- Decrease time-to-price by 30%  
+- Increase pricing consistency across neighborhoods  
+- Improve listing competitiveness  
+
+---
+
+## Technical Metric (The “How”)
+
+Model: **LassoCV (Regularized Linear Regression)**  
+
+Validation Results:
+
+- R² (train) ≈ 0.904  
+- R² (validation) ≈ 0.893  
+- 163 / 256 coefficients retained (automatic feature selection)  
+
+Target:
+
+- R² ≥ 0.88 on validation  
+- Stable residual distribution  
+- Controlled bias across price segments  
+
+---
+
+# 3. The Data
+
+## Dataset Overview
+
+Residential housing data from **Ames, Iowa**.
+
+- Target Variable: `SalePrice` (USD)  
+- 81 structured features including:
+  - Living area (GrLivArea)  
+  - Neighborhood  
+  - Year built  
+  - Basement and garage features  
+  - Overall quality indicators  
+
+---
+
+## Preprocessing Pipeline
+
+1. Missing Value Handling  
+   - Categorical → "None"  
+   - Numerical → 0  
+
+2. Rare Category Grouping  
+   - Categories with <10 observations grouped into "Other"  
+
+3. Log Transformation  
+   - Applied to skewed features  
+   - Target variable modeled in log-space  
+
+4. Multicollinearity Reduction  
+   - Removed features with correlation > 0.8  
+
+5. One-Hot Encoding  
+   - Applied to categorical variables  
+
+---
+
+## Data Governance
+
+- No personal identifiable information (PII)  
+- `/data`, `/models`, `/reports` excluded from Git  
 
 ---
 
