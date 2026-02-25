@@ -155,9 +155,9 @@ The full machine learning pipeline will eventually be executable through:
 
 `python src/main.py`
 
+---
 
-
-# 6. Business Canvas
+# Business Overview and Understanding: Canvas
 
 ## Client
 
