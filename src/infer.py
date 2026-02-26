@@ -18,8 +18,16 @@ from src.utils import ensure_parent_dir
 
 def load_artifact(model_path: str) -> Dict[str, Any]:
     artifact = joblib.load(model_path)
-    if not isinstance(artifact, dict) or "pipeline" not in artifact or "metadata" not in artifact:
-        raise TypeError("Model artifact must be a dict with keys: 'pipeline' and 'metadata'.")
+    # break the validation into several lines to satisfy lints
+    if (
+        not isinstance(artifact, dict)
+        or "pipeline" not in artifact
+        or "metadata" not in artifact
+    ):
+        raise TypeError(
+            "Model artifact must be a dict with keys: "
+            "'pipeline' and 'metadata'."
+        )
     return artifact
 
 
@@ -33,11 +41,18 @@ def run_inference(
     meta = artifact["metadata"]
 
     # Never require Id. Keep if present.
-    ids = input_df[id_col].copy() if id_col in input_df.columns else None
+    ids = (
+        input_df[id_col].copy()
+        if id_col in input_df.columns
+        else None
+    )
 
     # Predict in log space then invert
     preds_log = pipeline.predict(input_df)
-    preds = np.expm1(np.asarray(preds_log).reshape(-1)) if meta.get("target_transform") == "log1p" else np.asarray(preds_log).reshape(-1)
+    if meta.get("target_transform") == "log1p":
+        preds = np.expm1(np.asarray(preds_log).reshape(-1))
+    else:
+        preds = np.asarray(preds_log).reshape(-1)
 
     out = pd.DataFrame({pred_col: preds})
     if ids is not None:
@@ -45,7 +60,18 @@ def run_inference(
     return out
 
 
-def predict_csv(input_path: str, model_path: str, output_path: str, id_col: str = "Id", pred_col: str = "SalePrice") -> None:
+def predict_csv(
+    input_path: str,
+    model_path: str,
+    output_path: str,
+    artifact = load_artifact(model_path)
+    out = run_inference(
+        df,
+        artifact,
+        id_col=id_col,
+        pred_col=pred_col,
+    )
+) -> None:
     df = pd.read_csv(input_path)
     artifact = load_artifact(model_path)
     out = run_inference(df, artifact, id_col=id_col, pred_col=pred_col)
