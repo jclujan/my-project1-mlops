@@ -1,0 +1,40 @@
+name: mlops_project  # Name of the conda environment
+
+channels:
+  - conda-forge  # Community channel with most up-to-date packages
+  - defaults
+
+dependencies:
+  # Core Python
+  - python>=3.9 
+
+  # Data loading and manipulation
+  - pandas>=2.*  # DataFrames + CSV I/O
+  - numpy>=1.24  # Numerical arrays used across sklearn/pandas
+
+  # ML pipeline
+  - scikit-learn>=1.2  # Pipeline, ColumnTransformer, preprocessing, model training
+  - joblib>=1.3  # Save/load trained model artifacts (pickle alternative used by sklearn)
+
+  # Config and environment variables
+  - pyyaml>=6.0  # Read config.yaml
+  - python-dotenv>=1.0  # Load .env if needed later
+
+  # Reporting (optional but common for evaluate.py)
+  - matplotlib>=3.7  # Plots
+  - seaborn>=0.13  # Optional nicer plots (remove if not used)
+
+  # Excel support (keep only if you really use xlsx)
+  - openpyxl>=3.1
+
+  # Testing
+  - pytest>=7.4
+
+  # Pip support
+  - pip
+
+  # Pip-only dev tools and coverage
+  - pip:
+      - pytest-cov
+      - black
+      - flake8

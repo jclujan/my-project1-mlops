@@ -1,10 +1,36 @@
+# --------------------------------------------------
 # MLOps Project Configuration
-# This file will eventually control paths, hyperparameters, and toggles.
+# Controls paths, model settings, and training setup
+# --------------------------------------------------
 
 data:
-  raw: "data/raw/dataset.csv"
-  processed: "data/processed/clean.csv"
+  raw:
+    train_path: "data/raw/train.csv"
+    test_path: "data/raw/test.csv"
+
+  processed:
+    train_path: "data/processed/train_clean.csv"
+    test_path: "data/processed/test_clean.csv"
+
+  inference:
+    input_path: "data/inference/inference_input.csv" #change it here with laurenz's files
+    output_path: "data/inference/predictions.csv"
+
+model:
+  name: "lasso"
+  random_state: 42
 
 train:
   test_size: 0.2
+  cv_folds: 5
+  scoring: "neg_root_mean_squared_error"
+  #Negative root mean squared error
+  #We chose RMSE because it penalizes large prediction errors more heavily, 
+  #which is important in house pricing where large misestimations are costly. 
+  #Additionally, RMSE is expressed in the same unit as the target variable, making it easily interpretable for business stakeholders.
   seed: 42
+
+#this can be changed as well once we know the output
+output:
+  model_path: "models/model.pkl"
+  metrics_path: "reports/metrics.json"
