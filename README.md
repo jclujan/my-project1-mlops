@@ -141,6 +141,7 @@ This project follows a strict separation between "Sandbox" (Notebooks) and "Prod
 ├── data/                    # Local storage (IGNORED by Git)
 │   ├── raw/                 # Immutable input data
 │   └── processed/           # Cleaned data ready for training
+│   └── inference/           # Inference data without sales price for real world deployment
 │
 ├── models/                  # Serialized artifacts (IGNORED by Git)
 │
