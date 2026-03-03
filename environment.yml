@@ -1,16 +1,17 @@
-name: mlops_project  # Name of the conda environment
+name: mlops_project
 
 channels:
-  - conda-forge  # Community channel with most up-to-date packages
+  - conda-forge
   - defaults
 
 dependencies:
-  # Core Python
-  - python>=3.9 
+  # Stable Python 
+  - python=3.11
 
   # Core data stack
   - numpy=1.26.4
   - pandas=2.2.0
+  - pyarrow=15.0.2   # removes pandas future warning
 
   # ML pipeline
   - scikit-learn=1.4.1
@@ -20,7 +21,7 @@ dependencies:
   - pyyaml=6.0.1
   - python-dotenv=1.0.1
 
-  # Optional reporting (keep only if actually used)
+  # Optional reporting (remove if unused)
   - matplotlib=3.8.2
   - seaborn=0.13.2
 
