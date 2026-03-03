@@ -28,7 +28,6 @@ class CleanResult:
     dropped_columns: list[str]
 
 
-# In Ames Housing, these missing values often mean "feature not present"
 AMES_NONE_COLS = {
     "Alley", "BsmtQual", "BsmtCond", "BsmtExposure", "BsmtFinType1", "BsmtFinType2",
     "FireplaceQu", "GarageType", "GarageFinish", "GarageQual", "GarageCond",
@@ -38,25 +37,27 @@ AMES_NONE_COLS = {
 
 def _standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df.columns = [c.strip() for c in df.columns]
+    df.columns = (
+        pd.Index(df.columns)
+        .astype(str)
+        .str.strip()
+        .str.replace(" ", "_", regex=False)
+    )
     return df
 
 
 def _fill_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    # Fill "None" for known NA-means-absent categorical columns (if they exist)
     none_cols = [c for c in AMES_NONE_COLS if c in df.columns]
     if none_cols:
         df[none_cols] = df[none_cols].fillna("None")
 
-    # Numeric columns -> median
     num_cols = df.select_dtypes(include=["number"]).columns
     for col in num_cols:
         if df[col].isna().any():
             df[col] = df[col].fillna(df[col].median())
 
-    # Categorical/object columns -> mode (most frequent) or "Unknown" if mode missing
     cat_cols = df.select_dtypes(include=["object"]).columns
     for col in cat_cols:
         if df[col].isna().any():
@@ -72,50 +73,37 @@ def clean_housing_data(
     *,
     target_col: str = "SalePrice",
     drop_cols: Optional[list[str]] = None,
+    require_target: bool = False,
 ) -> CleanResult:
-    """
-    Light cleaning for (Ames) housing-style tabular data.
-
-    Args:
-        df: raw dataframe
-        target_col: target column name (present in train, absent in test)
-        drop_cols: columns to drop if present (e.g., ["Id"])
-
-    Returns:
-        CleanResult(X, y, dropped_columns)
-
-    Raises:
-        DataCleanError: for schema issues that make cleaning unsafe
-    """
     if df is None or not isinstance(df, pd.DataFrame):
         raise DataCleanError("Input must be a pandas DataFrame.")
-
     if df.empty:
         raise DataCleanError("Input DataFrame is empty.")
 
     df2 = _standardize_columns(df)
 
-    # Drop duplicates (keep first)
-    df2 = df2.drop_duplicates()
+    # Drop duplicates + reset index (safe + prevents misalignment later)
+    df2 = df2.drop_duplicates().reset_index(drop=True)
 
-    dropped = []
+    dropped_columns: list[str] = []
     if drop_cols:
-        for c in drop_cols:
-            if c in df2.columns:
-                df2 = df2.drop(columns=[c])
-                dropped.append(c)
+        existing = [c for c in drop_cols if c in df2.columns]
+        if existing:
+            df2 = df2.drop(columns=existing)
+            dropped_columns.extend(existing)
 
-    y = None
+    if require_target and target_col not in df2.columns:
+        raise DataCleanError(f"Missing required target column: {target_col}")
+
+    y: Optional[pd.Series] = None
     if target_col in df2.columns:
         y = df2[target_col].copy()
         df2 = df2.drop(columns=[target_col])
 
     df2 = _fill_missing_values(df2)
 
-    # Final sanity checks
     if df2.isna().any().any():
-        # If something still missing, stop early so validation can catch it explicitly
         remaining = df2.columns[df2.isna().any()].tolist()
         raise DataCleanError(f"Cleaning incomplete: still missing values in columns: {remaining}")
 
-    return CleanResult(X=df2, y=y, dropped_columns=dropped)
+    return CleanResult(X=df2, y=y, dropped_columns=dropped_columns)
