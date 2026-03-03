@@ -13,7 +13,7 @@ data:
     test_path: "data/processed/test_clean.csv"
 
   inference:
-    input_path: "data/inference/inference_input.csv" #change it here with laurenz's files
+    input_path: "data/inference/inference.csv" #change it here with laurenz's files (all good)
     output_path: "data/inference/predictions.csv"
 
 model:
