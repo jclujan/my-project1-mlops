@@ -1,16 +1,12 @@
 """
-Module: Data Cleaning
----------------------
-Role: Preprocessing, missing value imputation, and feature engineering.
-Input: pandas.DataFrame (Raw).
-Output: pandas.DataFrame (Processed/Clean).
-"""
-"""
 Module: Data Cleaner
 
 Role:
 - Make raw data compliant so the pipeline behaves predictably.
 - Keep it LIGHT: no scaling/encoding/feature engineering here.
+
+Input: pandas.DataFrame (Raw)
+Output: pandas.DataFrame (Processed/Clean)
 """
 
 from __future__ import annotations
