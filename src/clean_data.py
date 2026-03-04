@@ -6,7 +6,7 @@ Role:
 - Keep it LIGHT: no scaling/encoding/feature engineering here.
 
 Input: pandas.DataFrame (Raw)
-Output: pandas.DataFrame (Processed/Clean)
+Output: CleanResult(X, y, dropped_columns)
 """
 
 from __future__ import annotations
@@ -28,10 +28,23 @@ class CleanResult:
     dropped_columns: list[str]
 
 
+# In Ames Housing, these missing values often mean "feature not present"
 AMES_NONE_COLS = {
     "Alley", "BsmtQual", "BsmtCond", "BsmtExposure", "BsmtFinType1", "BsmtFinType2",
     "FireplaceQu", "GarageType", "GarageFinish", "GarageQual", "GarageCond",
     "PoolQC", "Fence", "MiscFeature", "MasVnrType",
+}
+
+# In Ames Housing, NA in these numeric columns often means "feature not present" -> fill 0
+AMES_ZERO_COLS = {
+    "GarageYrBlt",
+    "MasVnrArea",
+    "BsmtFinSF1",
+    "BsmtFinSF2",
+    "BsmtUnfSF",
+    "TotalBsmtSF",
+    "GarageArea",
+    "GarageCars",
 }
 
 
@@ -49,17 +62,27 @@ def _standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
 def _fill_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
+    # 1) Categorical NA means "None"
     none_cols = [c for c in AMES_NONE_COLS if c in df.columns]
     if none_cols:
         df[none_cols] = df[none_cols].fillna("None")
 
+    # 2) Numeric NA means "feature absent" -> fill 0
+    zero_cols = [c for c in AMES_ZERO_COLS if c in df.columns]
+    if zero_cols:
+        df[zero_cols] = df[zero_cols].fillna(0)
+
+    # 3) Remaining numeric -> median
     num_cols = df.select_dtypes(include=["number"]).columns
-    for col in num_cols:
+    remaining_num_cols = [c for c in num_cols if c not in AMES_ZERO_COLS]
+    for col in remaining_num_cols:
         if df[col].isna().any():
             df[col] = df[col].fillna(df[col].median())
 
+    # 4) Remaining categorical/object -> mode (or "Unknown")
     cat_cols = df.select_dtypes(include=["object"]).columns
-    for col in cat_cols:
+    remaining_cat_cols = [c for c in cat_cols if c not in AMES_NONE_COLS]
+    for col in remaining_cat_cols:
         if df[col].isna().any():
             mode_vals = df[col].mode(dropna=True)
             fill_val = mode_vals.iloc[0] if not mode_vals.empty else "Unknown"
@@ -75,6 +98,21 @@ def clean_housing_data(
     drop_cols: Optional[list[str]] = None,
     require_target: bool = False,
 ) -> CleanResult:
+    """
+    Light cleaning for (Ames) housing-style tabular data.
+
+    Args:
+        df: raw dataframe
+        target_col: target column name (present in train, absent in test)
+        drop_cols: columns to drop if present (e.g., ["Id"])
+        require_target: if True, raise error if target_col is missing
+
+    Returns:
+        CleanResult(X, y, dropped_columns)
+
+    Raises:
+        DataCleanError: for schema issues that make cleaning unsafe
+    """
     if df is None or not isinstance(df, pd.DataFrame):
         raise DataCleanError("Input must be a pandas DataFrame.")
     if df.empty:
@@ -102,6 +140,7 @@ def clean_housing_data(
 
     df2 = _fill_missing_values(df2)
 
+    # Final sanity check: no missing values left
     if df2.isna().any().any():
         remaining = df2.columns[df2.isna().any()].tolist()
         raise DataCleanError(f"Cleaning incomplete: still missing values in columns: {remaining}")
