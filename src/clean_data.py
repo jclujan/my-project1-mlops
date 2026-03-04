@@ -2,11 +2,11 @@
 Module: Data Cleaner
 
 Role:
-- Make raw data compliant so the pipeline behaves predictably.
-- Keep it LIGHT: no scaling/encoding/feature engineering here.
+- Make raw data structurally safe for the pipeline.
+- No imputation or feature engineering here.
 
 Input: pandas.DataFrame (Raw)
-Output: pandas.DataFrame (Processed/Clean)
+Output: CleanResult(X, y, dropped_columns)
 """
 
 from __future__ import annotations
@@ -28,13 +28,6 @@ class CleanResult:
     dropped_columns: list[str]
 
 
-AMES_NONE_COLS = {
-    "Alley", "BsmtQual", "BsmtCond", "BsmtExposure", "BsmtFinType1", "BsmtFinType2",
-    "FireplaceQu", "GarageType", "GarageFinish", "GarageQual", "GarageCond",
-    "PoolQC", "Fence", "MiscFeature", "MasVnrType",
-}
-
-
 def _standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = (
@@ -43,28 +36,6 @@ def _standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
         .str.strip()
         .str.replace(" ", "_", regex=False)
     )
-    return df
-
-
-def _fill_missing_values(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-
-    none_cols = [c for c in AMES_NONE_COLS if c in df.columns]
-    if none_cols:
-        df[none_cols] = df[none_cols].fillna("None")
-
-    num_cols = df.select_dtypes(include=["number"]).columns
-    for col in num_cols:
-        if df[col].isna().any():
-            df[col] = df[col].fillna(df[col].median())
-
-    cat_cols = df.select_dtypes(include=["object"]).columns
-    for col in cat_cols:
-        if df[col].isna().any():
-            mode_vals = df[col].mode(dropna=True)
-            fill_val = mode_vals.iloc[0] if not mode_vals.empty else "Unknown"
-            df[col] = df[col].fillna(fill_val)
-
     return df
 
 
@@ -82,7 +53,7 @@ def clean_housing_data(
 
     df2 = _standardize_columns(df)
 
-    # Drop duplicates + reset index (safe + prevents misalignment later)
+    # Drop duplicates
     df2 = df2.drop_duplicates().reset_index(drop=True)
 
     dropped_columns: list[str] = []
@@ -99,11 +70,5 @@ def clean_housing_data(
     if target_col in df2.columns:
         y = df2[target_col].copy()
         df2 = df2.drop(columns=[target_col])
-
-    df2 = _fill_missing_values(df2)
-
-    if df2.isna().any().any():
-        remaining = df2.columns[df2.isna().any()].tolist()
-        raise DataCleanError(f"Cleaning incomplete: still missing values in columns: {remaining}")
 
     return CleanResult(X=df2, y=y, dropped_columns=dropped_columns)
