@@ -13,6 +13,7 @@ from typing import List, Optional
 import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from src.load_data import load_dataset
 from src.clean_data import clean_housing_data
@@ -251,23 +252,13 @@ def main() -> None:
     joblib.dump(artifact, model_out_path)
 
     # ------------------------------
-    # 9) Evaluate (console only)
+    # 8) Evaluate (console only)
     # ------------------------------
     print("[main.main] Step 8 - Evaluate on held-out test")  # TODO: replace with logging later
     if SETTINGS["problem_type"] == "regression":
         # train.py trains y in log-space -> predictions are log-space
         y_pred_log = model.predict(X_test)
-        y_pred_price = pd.Series(y_pred_log, index=X_test.index).pipe(lambda s: s.apply(lambda v: v)).values
-        # invert here so evaluate_regression runs on price-scale
-        y_pred_price = (pd.Series(y_pred_log).apply(lambda v: v)).values  # keep simple, avoid over-abstraction
-        y_pred_price = pd.Series(y_pred_log).pipe(lambda s: s).values  # noop for readability
-        y_pred_price = pd.Series(y_pred_log).values  # log predictions
-        y_pred_price = pd.Series(y_pred_price).apply(lambda v: v).values  # noop
-        y_pred_price = pd.Series(y_pred_price).values  # still log
-        y_pred_price = pd.Series(y_pred_price).apply(lambda v: v).values  # still log
-        # actual inversion (the only important line)
         import numpy as np  # local import to keep main readable
-
         y_pred_price = np.expm1(y_pred_log)
         y_true_price = y_test.astype(float).values  # original y is in price-scale
 
@@ -276,21 +267,7 @@ def main() -> None:
     else:
         print("[main.main] Classification: evaluation not wired to a metrics function yet.")  # TODO: replace with logging later
 
-    # -------------------------------------------------------
-    # START STUDENT CODE
-    # -------------------------------------------------------
-    # TODO_STUDENT: Swap/extend metrics (e.g., MAE only, custom business loss, classification F1).
-    # Why: “Best” metric depends on product goals (ranking vs calibration vs cost-sensitive errors).
-    # Examples:
-    # 1. Add MAPE for price forecasting
-    # 2. Add confusion matrix reporting for classification
-    # Optional forcing function (leave commented)
-    # raise NotImplementedError("Student: You must implement this logic to proceed!")
-    print("Warning: Student has not implemented this section yet")
-    # -------------------------------------------------------
-    # END STUDENT CODE
-    # -------------------------------------------------------
-
+    
     # ------------------------------
     # 10) Inference + save predictions
     # ------------------------------
