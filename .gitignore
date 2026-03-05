@@ -13,6 +13,7 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .coverage
+.coverage.*
 dist/
 build/
 
@@ -33,3 +34,6 @@ data/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/inference/.gitkeep
+
+# Experiment notebook outputs (isolated from pipeline artifacts)
+notebook/outputs/
