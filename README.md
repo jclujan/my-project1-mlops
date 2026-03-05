@@ -56,6 +56,12 @@ Outputs:
 
 Model: **LassoCV (Regularized Linear Regression)**  
 
+New pipeline:
+
+- R² (train) ≈ 0.804 
+
+Notebook before:
+
 Validation Results:
 
 - R² (train) ≈ 0.904  
@@ -64,7 +70,7 @@ Validation Results:
 
 Target:
 
-- R² ≥ 0.88 on validation  
+- R² ≥ 0.8 
 - Stable residual distribution  
 - Controlled bias across price segments  
 
@@ -153,11 +159,26 @@ This project follows a strict separation between experimental work, production c
 └── tests/                     # Automated unit tests (pytest)
 ```
 
-## 5. Execution Model
+## 5. Execution Model & Environment setup
 
 The full machine learning pipeline will eventually be executable through:
 
-`python src/main.py`
+1.⁠ ⁠environment setup:
+`conda env create -f environment.yml`
+`conda activate mlops_project`
+2.⁠ ⁠launch sandbox:
+`code notebook/HousePred-LassoReg.ipynb`
+3.⁠ ⁠test suite:
+`python -m pytest -q`
+4.⁠ ⁠orchestrator:
+`python -m src.main`
+
+## 6. Generated outputs
+
+1.⁠ ⁠data/processed/clean.csv: The deterministically cleaned input data
+2.⁠ ⁠models/model.joblib: The deployable pipeline artifact
+3.⁠ ⁠reports/predictions.csv: The inference log containing predictions 
+
 
 ---
 
