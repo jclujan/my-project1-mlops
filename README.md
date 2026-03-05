@@ -234,7 +234,7 @@ Current pricing relies heavily on:
 
 ## Goal (Quantifiable KPI)
 
-- Validation R² ≥ 0.88  
+- Validation R² ≥ 0.8  
 - Reduced pricing variance  
 - Faster listing preparation  
 - Improved pricing consistency  
