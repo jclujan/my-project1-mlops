@@ -56,6 +56,12 @@ Outputs:
 
 Model: **LassoCV (Regularized Linear Regression)**  
 
+New pipeline:
+
+- R² (train) ≈ 0.804 
+
+Notebook before:
+
 Validation Results:
 
 - R² (train) ≈ 0.904  
@@ -64,7 +70,7 @@ Validation Results:
 
 Target:
 
-- R² ≥ 0.88 on validation  
+- R² ≥ 0.8 
 - Stable residual distribution  
 - Controlled bias across price segments  
 
@@ -116,45 +122,68 @@ Residential housing data from **Ames, Iowa**.
 
 ## 4. Repository Structure
 
-This project follows a strict separation between "Sandbox" (Notebooks) and "Production" (Src).
+This project follows a strict separation between experimental work, production code, data layers, and testing.
 
 ```text
 .
-├── README.md                # This file (Project definition)
-├── environment.yml          # Dependencies (Conda/Pip)
-├── config.yaml              # Global configuration (paths, params)
-├── .env                     # Secrets placeholder
+├── README.md                  # Project documentation
+├── LICENSE                    # License file
+├── .gitignore                 # Git ignored files
+├── config.yaml                # Global configuration (paths, parameters)
+├── environment.yml            # Conda environment specification
 │
-├── notebooks/               # Experimental sandbox
-│   └── yourbaseline.ipynb   # From previous work
+├── data/                      # Local data storage (ignored by Git)
+│   ├── raw/                   # Immutable original datasets
+│   ├── processed/             # Cleaned datasets for training
+│   └── inference/             # Unseen data for inference (no SalePrice)
 │
-├── src/                     # Production code (The "Factory")
-│   ├── __init__.py          # Python package
-│   ├── load_data.py         # Ingest raw data
-│   ├── clean_data.py        # Preprocessing & cleaning
-│   ├── validate.py          # Data quality checks
-│   ├── train.py             # Model training & saving
-│   ├── evaluate.py          # Metrics & plotting
-│   ├── infer.py             # Inference logic
-│   └── main.py              # Pipeline orchestrator
+├── models/                    # Saved trained model artifacts (ignored by Git)
 │
-├── data/                    # Local storage (IGNORED by Git)
-│   ├── raw/                 # Immutable input data
-│   └── processed/           # Cleaned data ready for training
-│   └── inference/           # Inference data without sales price for real world deployment
+├── reports/                   # Generated metrics, evaluation outputs, predictions
 │
-├── models/                  # Serialized artifacts (IGNORED by Git)
+├── notebook/                  # Experimental sandbox (Jupyter notebooks)
+│   └── HousePred-LassoReg.ipynb   # Original baseline notebook
 │
-├── reports/                 # Generated metrics, plots, and figures
+├── src/                       # Production pipeline (core ML system)
+│   ├── __init__.py            # Makes src a Python package
+│   ├── clean_data.py          # Data preprocessing & feature preparation
+│   ├── evaluate.py            # Model evaluation and metrics handling
+│   ├── features.py            # Feature engineering utilities
+│   ├── infer.py               # Inference logic (prediction on new data)
+│   ├── load_data.py           # Data loading utilities
+│   ├── main.py                # Pipeline orchestrator (training workflow)
+│   ├── train.py               # Model training logic
+│   ├── utils.py               # Helper utilities (e.g., path handling)
+│   └── validate.py            # Data validation checks
 │
-└── tests/                   # Automated tests
+└── tests/                     # Automated unit tests (pytest)
 ```
 
-## 5. Execution Model
+## 5. Execution Model & Environment setup
 
 The full machine learning pipeline will eventually be executable through:
 
-`python src/main.py`
+1.⁠ ⁠environment setup:
+`conda env create -f environment.yml`
+`conda activate mlops_project`
+
+2.⁠ ⁠launch sandbox:
+`code notebook/HousePred-LassoReg.ipynb`
+
+3.⁠ ⁠test suite:
+`python -m pytest -q`
+
+4.⁠ ⁠orchestrator:
+`python -m src.main`
+
+## 6. Generated outputs
+
+1.⁠ ⁠data/processed/clean.csv: The deterministically cleaned input data
+
+2.⁠ ⁠models/model.joblib: The deployable pipeline artifact
+
+3.⁠ ⁠reports/predictions.csv: The inference log containing predictions 
+
 
 ---
 
