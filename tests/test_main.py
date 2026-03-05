@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 
 import src.main as m
+import src.utils as u
 
 
 @dataclass
@@ -22,13 +23,13 @@ class _FakeModel:
 
 def test__load_config_raises_if_missing(tmp_path: Path):
     with pytest.raises(FileNotFoundError):
-        m._load_config(tmp_path / "missing.yaml")
+        u.load_config(tmp_path / "missing.yaml")
 
 
 def test__fail_fast_feature_checks_missing_cols_raises():
     X = pd.DataFrame({"a": [1], "b": [2]})
     with pytest.raises(ValueError):
-        m._fail_fast_feature_checks(
+        u.fail_fast_feature_checks(
             X,
             quantile_bin=["c"],
             categorical_onehot=[],
@@ -39,7 +40,7 @@ def test__fail_fast_feature_checks_missing_cols_raises():
 def test__fail_fast_feature_checks_non_numeric_quantile_bin_raises():
     X = pd.DataFrame({"q": ["x"], "n": [1]})
     with pytest.raises(ValueError):
-        m._fail_fast_feature_checks(
+        u.fail_fast_feature_checks(
             X,
             quantile_bin=["q"],
             categorical_onehot=[],
@@ -58,6 +59,10 @@ def test_main_happy_path_writes_artifacts(tmp_path: Path, monkeypatch: pytest.Mo
         "data": {
             "raw": {"train_path": str(train_path), "test_path": str(test_path)},
             "processed": {"clean_path": str(clean_out_path)},
+            "inference": {
+                "input_path": str(tmp_path / "data" / "inference" / "input.csv"),
+                "output_path": str(tmp_path / "data" / "inference" / "output.csv"),
+            },
         },
         "output": {
             "model_path": str(model_out_path),
@@ -130,7 +135,7 @@ def test_main_happy_path_writes_artifacts(tmp_path: Path, monkeypatch: pytest.Mo
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         Path(path).write_bytes(b"artifact")
 
-    monkeypatch.setattr(m, "_load_config", fake_load_config)
+    monkeypatch.setattr(m, "load_config", fake_load_config)
     monkeypatch.setattr(m, "load_dataset", fake_load_dataset)
     monkeypatch.setattr(m, "clean_housing_data", fake_clean_housing_data)
     monkeypatch.setattr(m, "validate_dataframe", fake_validate_dataframe)

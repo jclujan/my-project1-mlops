@@ -206,8 +206,6 @@ def main() -> None:
     # ------------------------------
     print("[main] Step 9 - Inference + save predictions")
     infer_input_path = Path(cfg["data"]["inference"]["input_path"])
-    infer_output_path = Path(cfg["data"]["inference"]["output_path"])
-    infer_output_path.parent.mkdir(parents=True, exist_ok=True)
 
     if infer_input_path.exists():
         print(f"[main] Loading inference data from: {infer_input_path}")
@@ -233,11 +231,6 @@ def main() -> None:
         id_col=id_column,
         pred_col=target_column,
     )
-
-    # Save to data/inference/ and reports/
-    ensure_parent_dir(str(infer_output_path))
-    preds_df.to_csv(infer_output_path, index=False)
-    print(f"[main] Saved predictions to: {infer_output_path}")
 
     ensure_parent_dir(str(preds_out_path))
     preds_df.to_csv(preds_out_path, index=False)
