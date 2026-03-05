@@ -131,6 +131,8 @@ This project follows a strict separation between experimental work, production c
 ├── .gitignore                 # Git ignored files
 ├── config.yaml                # Global configuration (paths, parameters)
 ├── environment.yml            # Conda environment specification
+├── .coveragerc                # Configures the coverage tool itself
+├── pytest.ini                 # Configures how pytest is running
 │
 ├── data/                      # Local data storage (ignored by Git)
 │   ├── raw/                   # Immutable original datasets
