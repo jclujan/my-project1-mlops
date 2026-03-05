@@ -142,7 +142,8 @@ This project follows a strict separation between experimental work, production c
 ├── reports/                   # Generated metrics, evaluation outputs, predictions
 │
 ├── notebook/                  # Experimental sandbox (Jupyter notebooks)
-│   └── HousePred-LassoReg.ipynb   # Original baseline notebook
+│   ├── HousePred-LassoReg.ipynb   # Original baseline notebook
+│   ├── experiment.pynb       # notebook for data scientists (experimental)
 │
 ├── src/                       # Production pipeline (core ML system)
 │   ├── __init__.py            # Makes src a Python package
@@ -234,7 +235,7 @@ Current pricing relies heavily on:
 
 ## Goal (Quantifiable KPI)
 
-- Validation R² ≥ 0.88  
+- Validation R² ≥ 0.8  
 - Reduced pricing variance  
 - Faster listing preparation  
 - Improved pricing consistency  

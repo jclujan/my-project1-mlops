@@ -13,12 +13,10 @@ TODO: Replace print statements with standard library logging in a later session
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
 
 import joblib
 import numpy as np
 import pandas as pd
-import yaml
 from sklearn.model_selection import train_test_split
 
 from src.load_data import load_dataset, load_csv
@@ -28,114 +26,18 @@ from src.features import get_feature_preprocessor
 from src.train import train_model
 from src.evaluate import evaluate_regression
 from src.infer import run_inference
-from src.utils import ensure_parent_dir
+from src.utils import (
+    load_config,
+    make_dummy_ames_like_csv,
+    fail_fast_feature_checks,
+    ensure_parent_dir,
+)
 
 
 # ------------------------------
 # CONFIGURATION — loaded from config.yaml
 # ------------------------------
 _CONFIG_PATH = Path(__file__).parent.parent / "config.yaml"
-
-
-def _load_config(path: Path = _CONFIG_PATH) -> dict:
-    """
-    Inputs:
-    - path: Location of config.yaml (defaults to project root).
-    Outputs:
-    - cfg: Parsed config dictionary.
-    Why this contract matters for reliable ML delivery:
-    - A single config file means changing a path or hyperparameter never
-      requires touching Python code.
-    """
-    if not path.exists():
-        raise FileNotFoundError(
-            f"config.yaml not found at {path}. "
-            "Make sure you run from the project root."
-        )
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
-
-
-def _make_dummy_ames_like_csv(path: Path) -> None:
-    """
-    Inputs:
-    - path: Where to write a dummy CSV if the real one is missing.
-    Outputs:
-    - None (writes a tiny deterministic CSV).
-    Why this contract matters for reliable ML delivery:
-    - Keeps the repo runnable end-to-end so CI and onboarding work even
-      before real data is wired.
-    """
-    # TODO: replace with logging later
-    print(f"[main] Creating dummy dataset at: {path}")
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    df = pd.DataFrame(
-        {
-            "Id": [1, 2, 3, 4, 5, 6, 7, 8],
-            "Neighborhood": [
-                "NAmes", "CollgCr", "OldTown", "NAmes",
-                "Somerst", "Edwards", "NAmes", "Sawyer",
-            ],
-            "OverallQual": [5, 7, 4, 6, 8, 5, 6, 7],
-            "YearBuilt": [1960, 2003, 1920, 1975, 2007, 1950, 1985, 1995],
-            "LotArea": [8450, 9600, 11250, 9550, 14260, 14115, 10084, 10382],
-            "GrLivArea": [1710, 1262, 1786, 1717, 2198, 1362, 1694, 2090],
-            "SalePrice": [
-                208500, 181500, 223500, 140000,
-                250000, 143000, 307000, 200000,
-            ],
-        }
-    )
-    df.to_csv(path, index=False)
-
-    print("!" * 70)
-    print("LOUD WARNING: Dummy dataset created for scaffolding ONLY.")
-    print("Replace data/raw/train.csv (and test.csv) with your real dataset")
-    print("and update features in config.yaml accordingly.")
-    print("Dummy columns:", list(df.columns))
-    print("!" * 70)
-
-
-def _fail_fast_feature_checks(
-    X: pd.DataFrame,
-    *,
-    quantile_bin: List[str],
-    categorical_onehot: List[str],
-    numeric_passthrough: List[str],
-) -> None:
-    """
-    Inputs:
-    - X: Feature dataframe (already cleaned, target removed).
-    - quantile_bin / categorical_onehot / numeric_passthrough: feature lists.
-    Outputs:
-    - None (raises ValueError on misconfiguration).
-    Why this contract matters for reliable ML delivery:
-    - Most pipeline failures are config/schema mismatches; failing fast saves
-      time and avoids silent bugs.
-    """
-    # TODO: replace with logging later
-    print("[main] Checking feature configuration vs dataframe schema")
-
-    configured = list(
-        dict.fromkeys(quantile_bin + categorical_onehot + numeric_passthrough)
-    )
-    missing = [c for c in configured if c not in X.columns]
-    if missing:
-        raise ValueError(
-            f"Feature config error: columns missing from X: {missing}. "
-            f"Available: {list(X.columns)}"
-        )
-
-    non_numeric_bins = [
-        c for c in quantile_bin
-        if not pd.api.types.is_numeric_dtype(X[c])
-    ]
-    if non_numeric_bins:
-        raise ValueError(
-            "Feature config error: quantile_bin columns must be numeric, "
-            f"but these are not: {non_numeric_bins}"
-        )
 
 
 def main() -> None:
@@ -155,7 +57,7 @@ def main() -> None:
     # 0) Load config + resolve paths
     # ------------------------------
     print("[main] Step 0 - Load config and ensure output directories exist")
-    cfg = _load_config()
+    cfg = load_config(_CONFIG_PATH)
 
     train_path = Path(cfg["data"]["raw"]["train_path"])
     test_path = Path(cfg["data"]["raw"]["test_path"])
@@ -167,16 +69,16 @@ def main() -> None:
     target_column = cfg["pipeline"]["target_column"]
     id_column = cfg["pipeline"]["id_column"]
 
-    clean_out_path.parent.mkdir(parents=True, exist_ok=True)
-    model_out_path.parent.mkdir(parents=True, exist_ok=True)
-    preds_out_path.parent.mkdir(parents=True, exist_ok=True)
+    ensure_parent_dir(clean_out_path)
+    ensure_parent_dir(model_out_path)
+    ensure_parent_dir(preds_out_path)
 
     # ------------------------------
     # 1) Load (or create dummy)
     # ------------------------------
     print("[main] Step 1 - Load raw data")  # TODO: replace with logging later
     if not train_path.exists():
-        _make_dummy_ames_like_csv(train_path)
+        make_dummy_ames_like_csv(train_path)
 
     data = load_dataset(train_path, test_path if test_path.exists() else None)
     df_train_raw = data["train"].df
@@ -245,7 +147,7 @@ def main() -> None:
     # ------------------------------
     # 5) Fail-fast feature config checks (post-split)
     # ------------------------------
-    _fail_fast_feature_checks(
+    fail_fast_feature_checks(
         X_train,
         quantile_bin=cfg["features"]["quantile_bin"],
         categorical_onehot=cfg["features"]["categorical_onehot"],

@@ -90,7 +90,3 @@ def evaluate_regression(y_true: ArrayLike, y_pred: ArrayLike, *, compute_rmsle: 
     print(f"[evaluate.evaluate_regression] Metrics: {metrics}")
     return metrics
 
-if __name__ == "__main__":
-    y_true = [100000, 150000, 200000]
-    y_pred = [110000, 140000, 210000]
-    print(evaluate_regression(y_true, y_pred, compute_rmsle=True))
