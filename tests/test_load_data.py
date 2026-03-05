@@ -38,3 +38,23 @@ def test_load_csv_empty_csv(tmp_path):
 
     with pytest.raises(DataLoadError):
         load_csv(empty_path)
+
+def test_load_csv_nrows(tmp_path):
+    csv_path = tmp_path / "big.csv"
+    df = pd.DataFrame({"A": range(100), "B": range(100)})
+    df.to_csv(csv_path, index=False)
+
+    result = load_csv(csv_path, nrows=20)
+
+    assert result.df.shape == (20, 2)
+
+
+def test_load_dataset_nrows(tmp_path):
+    csv_path = tmp_path / "train.csv"
+    df = pd.DataFrame({"A": range(50), "B": range(50)})
+    df.to_csv(csv_path, index=False)
+
+    from src.load_data import load_dataset
+    result = load_dataset(csv_path, nrows=10)
+
+    assert result["train"].df.shape[0] == 10

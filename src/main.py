@@ -21,7 +21,7 @@ import pandas as pd
 import yaml
 from sklearn.model_selection import train_test_split
 
-from src.load_data import load_dataset
+from src.load_data import load_dataset, load_csv
 from src.clean_data import clean_housing_data
 from src.validate import validate_dataframe
 from src.features import get_feature_preprocessor
@@ -300,21 +300,29 @@ def main() -> None:
         print("[main] Classification: evaluation not wired yet.")
 
     # ------------------------------
-    # 9) Inference + save predictions
+    # 9) Inference on unseen data + save predictions
     # ------------------------------
     print("[main] Step 9 - Inference + save predictions")
-    if "test" in data:
-        print("[main] Using provided test.csv for inference")
-        df_test_raw = data["test"].df
-        clean_test = clean_housing_data(
-            df_test_raw,
+    infer_input_path = Path(cfg["data"]["inference"]["input_path"])
+    infer_output_path = Path(cfg["data"]["inference"]["output_path"])
+    infer_output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if infer_input_path.exists():
+        print(f"[main] Loading inference data from: {infer_input_path}")
+        infer_result = load_csv(infer_input_path)
+        clean_infer = clean_housing_data(
+            infer_result.df,
             target_col=target_column,
             drop_cols=cfg["cleaning"]["drop_cols"],
             require_target=False,
         )
-        X_infer = clean_test.X
+        X_infer = clean_infer.X
+        print(f"[main] Inference rows: {len(X_infer)}")
     else:
-        print("[main] No test.csv found; inferring on X_test split")
+        print(
+            f"[main] No inference file at {infer_input_path}; "
+            "falling back to X_test split"
+        )
         X_infer = X_test.copy()
 
     preds_df = run_inference(
@@ -323,6 +331,11 @@ def main() -> None:
         id_col=id_column,
         pred_col=target_column,
     )
+
+    # Save to data/inference/ and reports/
+    ensure_parent_dir(str(infer_output_path))
+    preds_df.to_csv(infer_output_path, index=False)
+    print(f"[main] Saved predictions to: {infer_output_path}")
 
     ensure_parent_dir(str(preds_out_path))
     preds_df.to_csv(preds_out_path, index=False)
