@@ -313,7 +313,7 @@ def main() -> None:
         clean_infer = clean_housing_data(
             infer_result.df,
             target_col=target_column,
-            drop_cols=cfg["cleaning"]["drop_cols"],
+            drop_cols=[],  # keep Id so run_inference can include it in output
             require_target=False,
         )
         X_infer = clean_infer.X
