@@ -142,7 +142,8 @@ This project follows a strict separation between experimental work, production c
 ├── reports/                   # Generated metrics, evaluation outputs, predictions
 │
 ├── notebook/                  # Experimental sandbox (Jupyter notebooks)
-│   └── HousePred-LassoReg.ipynb   # Original baseline notebook
+│   ├── HousePred-LassoReg.ipynb   # Original baseline notebook
+│   ├── experiment.pynb       # notebook for data scientists (experimental)
 │
 ├── src/                       # Production pipeline (core ML system)
 │   ├── __init__.py            # Makes src a Python package
