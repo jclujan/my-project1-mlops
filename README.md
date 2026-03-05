@@ -166,17 +166,22 @@ The full machine learning pipeline will eventually be executable through:
 1.⁠ ⁠environment setup:
 `conda env create -f environment.yml`
 `conda activate mlops_project`
+
 2.⁠ ⁠launch sandbox:
 `code notebook/HousePred-LassoReg.ipynb`
+
 3.⁠ ⁠test suite:
 `python -m pytest -q`
+
 4.⁠ ⁠orchestrator:
 `python -m src.main`
 
 ## 6. Generated outputs
 
 1.⁠ ⁠data/processed/clean.csv: The deterministically cleaned input data
+
 2.⁠ ⁠models/model.joblib: The deployable pipeline artifact
+
 3.⁠ ⁠reports/predictions.csv: The inference log containing predictions 
 
 
