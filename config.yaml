@@ -1,10 +1,66 @@
+# --------------------------------------------------
 # MLOps Project Configuration
-# This file will eventually control paths, hyperparameters, and toggles.
+# Controls paths, model settings, and training setup
+# --------------------------------------------------
 
+# ── Data paths ────────────────────────────────────
 data:
-  raw: "data/raw/dataset.csv"
-  processed: "data/processed/clean.csv"
+  raw:
+    train_path: "data/raw/train.csv"
+    test_path:  "data/raw/test.csv"
 
+  processed:
+    clean_path: "data/processed/clean.csv"
+
+  inference:
+    input_path:  "data/inference/inference.csv"
+    output_path: "data/inference/predictions.csv"
+
+# ── Output artifacts ──────────────────────────────
+output:
+  model_path:   "models/model.joblib"
+  metrics_path: "reports/metrics.json"
+  predictions_path: "reports/predictions.csv"
+
+# ── Pipeline settings ─────────────────────────────
+pipeline:
+  problem_type:  "regression"   # "regression" or "classification"
+  target_column: "SalePrice"
+  id_column:     "Id"
+
+# ── Training ──────────────────────────────────────
 train:
   test_size: 0.2
-  seed: 42
+  random_state: 42
+  cv_folds: 5
+  scoring: "neg_root_mean_squared_error"
+  # We chose RMSE because it penalizes large prediction errors more heavily,
+  # which is important in house pricing where large misestimations are costly.
+  # Additionally, RMSE is expressed in the same unit as the target variable,
+  # making it easily interpretable for business stakeholders.
+
+# ── Model ─────────────────────────────────────────
+model:
+  name: "lasso"
+
+# ── Feature engineering ───────────────────────────
+# quantile_bin      → numeric cols binned into n_bins quantile buckets
+# categorical_ohe   → categorical cols one-hot encoded
+# numeric_passthrough → numeric cols median-imputed + StandardScaled
+#
+# LOUD REMINDER: map these lists to your real dataset columns.
+features:
+  quantile_bin:
+    - "LotArea"
+    - "GrLivArea"
+  categorical_onehot:
+    - "Neighborhood"
+  numeric_passthrough:
+    - "OverallQual"
+    - "YearBuilt"
+  n_bins: 3
+
+# ── Cleaning ──────────────────────────────────────
+cleaning:
+  drop_cols:
+    - "Id"   # removed from X; inference can still keep Id if present
