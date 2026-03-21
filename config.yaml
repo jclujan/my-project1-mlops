@@ -64,3 +64,13 @@ features:
 cleaning:
   drop_cols:
     - "Id"   # removed from X; inference can still keep Id if present
+
+# ── Logging ───────────────────────────────────────
+logging:
+  level: "INFO"
+  log_file: "logs/pipeline.log"
+ 
+# ── Weights & Biases ──────────────────────────────
+wandb:
+  project:               "house-price-prediction"
+  model_artifact_name:   "house-price-model"
