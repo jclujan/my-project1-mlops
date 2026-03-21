@@ -1,15 +1,17 @@
-# Python
+# ── Secrets — NEVER commit these ─────────────────
+.env
+
+# ── Python ────────────────────────────────────────
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 
-# Environments
-.env
+# ── Environments ──────────────────────────────────
 .venv/
-env/
 venv/
+env/
 
-# Tooling
+# ── Tooling ───────────────────────────────────────
 .pytest_cache/
 .mypy_cache/
 .coverage
@@ -17,16 +19,14 @@ venv/
 dist/
 build/
 
-# OS and IDE
+# ── OS and IDE ────────────────────────────────────
 .DS_Store
+Thumbs.db
 .vscode/
 .idea/
+*.swp
 
-# Local artifacts
-models/*
-!models/.gitkeep
-
-# Ignore data contents but keep folder structure
+# ── Data — keep folder structure, ignore contents ─
 data/*
 !data/raw/
 !data/processed/
@@ -35,5 +35,21 @@ data/*
 !data/processed/.gitkeep
 !data/inference/.gitkeep
 
-# Experiment notebook outputs (isolated from pipeline artifacts)
+# ── Model artifacts ───────────────────────────────
+models/*
+!models/.gitkeep
+
+# ── Reports and outputs ───────────────────────────
+reports/*
+!reports/.gitkeep
+
+# ── Logs ──────────────────────────────────────────
+logs/*
+!logs/.gitkeep
+*.log
+
+# ── Weights & Biases local cache ──────────────────
+wandb/
+
+# ── Notebook outputs ──────────────────────────────
 notebook/outputs/
