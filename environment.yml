@@ -27,7 +27,7 @@ dependencies:
   - pydantic=2.6.4
 
   # Experiment tracking
-  - wandb=0.16.6
+  - wandb>=0.18.0
 
   # Reporting
   - matplotlib=3.8.2
