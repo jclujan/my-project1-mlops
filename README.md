@@ -333,7 +333,44 @@ Estimated pilot budget: **$60k – $120k**
 
 ### Mitigation
 
-- Continuous monitoring of residuals  
-- Scheduled retraining  
-- Bias audits  
-- Geographic data expansion  
+- Continuous monitoring of residuals
+- Scheduled retraining
+- Bias audits
+- Geographic data expansion
+
+---
+
+## 7. Model Card
+
+| Field | Details |
+|---|---|
+| **Model type** | Lasso Regression (regularized linear model) |
+| **Target** | `SalePrice` (USD, modeled in log-space via `log1p`, inverted at inference with `expm1`) |
+| **Input features** | `OverallQual`, `YearBuilt`, `LotArea`, `GrLivArea`, `Neighborhood` |
+| **Training data** | Ames, Iowa residential housing dataset (`data/raw/train.csv`) |
+| **Train/test split** | 80% train / 20% test, `random_state=42` |
+| **Hyperparameter tuning** | GridSearchCV over `alpha ∈ [0.0005, 0.001, 0.005, 0.01, 0.05, 0.1]`, 5-fold KFold CV |
+| **Evaluation metrics** | RMSE, MAE, R², RMSLE |
+| **Reported R² (train)** | ≈ 0.804 |
+| **Reported R² (test)** | ≈ 0.893 (baseline notebook) |
+| **Model registry** | W&B artifact aliased `prod` under `juan-lujan-/house-price-prediction` |
+| **Inference** | Served via FastAPI `/predict` endpoint, pulls `prod` artifact from W&B at startup |
+| **Known limitations** | Trained on Ames, Iowa only — may not generalize to other markets without retraining |
+| **Fairness considerations** | No demographic data used; `Neighborhood` encoding may reflect historical pricing biases |
+
+---
+
+## 8. Changelog
+
+### v1.0.0 — 2026-03-22
+- Initial production release
+- Modular `src/` pipeline: `load_data`, `clean_data`, `validate`, `features`, `train`, `evaluate`, `infer`
+- `main.py` orchestrates end-to-end training with W&B tracking and model artifact upload
+- FastAPI `/health` and `/predict` endpoints with Pydantic strict contract
+- Dual-output logging (console + file) via `src/logger.py` — zero `print()` in production code
+- Docker containerization with `.dockerignore` for lean image
+- CI pipeline (`.github/workflows/ci.yml`) runs tests and validates Docker build on every PR
+- CD pipeline (`.github/workflows/deploy.yml`) deploys to Render on GitHub Release
+- `conda-lock.yml` for fully reproducible Linux environment
+- 54 tests across all modules, 84% coverage
+- W&B model artifact promoted with alias `prod` for production inference
