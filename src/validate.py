@@ -5,7 +5,11 @@ Role: Check data quality (schema, types, ranges) before training.
 Input: pandas.DataFrame.
 Output: Boolean (True if valid) or raises Error.
 """
+import logging
+
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 def validate_dataframe(df: pd.DataFrame, required_columns: list) -> bool:
@@ -20,7 +24,7 @@ def validate_dataframe(df: pd.DataFrame, required_columns: list) -> bool:
     - Prevents silent schema drift (broken training + incorrect inference).
     - Fail fast on obvious issues to avoid wasting compute and producing bad models.
     """
-    print("[validate.validate_dataframe] Validating dataframe (fail fast)")  # TODO: replace with logging later
+    logger.debug("Validating dataframe (fail fast)")
 
     # ----------------------------
     # Basic structural checks
@@ -114,6 +118,6 @@ def validate_dataframe(df: pd.DataFrame, required_columns: list) -> bool:
                 n_bad = int((df[c] < 0).sum())
                 raise ValueError(f"Validation failed: '{c}' has {n_bad} negative values (must be >= 0).")
 
-    print("[validate.validate_dataframe] OK")
+    logger.debug("Validation OK")
     return True
 

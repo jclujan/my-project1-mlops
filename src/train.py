@@ -12,9 +12,13 @@ Educational Goal:
 - Keep preprocessing inside the Pipeline to avoid leakage.
 """
 
+import logging
+
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import Lasso, LogisticRegression
+
+logger = logging.getLogger(__name__)
 from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
 from sklearn.pipeline import Pipeline
 
@@ -40,7 +44,7 @@ def train_model(
       This means the model learns log(price), not price directly.
       Downstream evaluation/inference must invert the transform with expm1.
     """
-    print("[train.train_model] Training model pipeline")  # Stephan: replace with logging later
+    logger.info("Training model pipeline")
 
     X_fit = X_train.copy()
     y_fit = y_train.copy()

@@ -7,9 +7,12 @@ Educational Goal:
 
 #test comment
 
+import logging
 from typing import List, Optional
 
 from sklearn.compose import ColumnTransformer
+
+logger = logging.getLogger(__name__)
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import KBinsDiscretizer, OneHotEncoder, StandardScaler
@@ -32,7 +35,7 @@ def get_feature_preprocessor(
     Why this contract matters for reliable ML delivery:
     - Keeping preprocessing inside the model Pipeline prevents leakage and ensures training and inference use identical transforms.
     """
-    print("[features.get_feature_preprocessor] Building feature preprocessing recipe")  # TODO: replace with logging later
+    logger.info("Building feature preprocessing recipe")
 
     quantile_bin_cols = quantile_bin_cols or []
     categorical_onehot_cols = categorical_onehot_cols or []
@@ -93,7 +96,7 @@ def get_feature_preprocessor(
     #
     # If we haven't implemented this yet:
     # - Leave it as a warning for now, but remove the warning once implemented.
-    print("Warning: Project specific logic not implemented yet")
+    logger.warning("Project specific logic not implemented yet")
     # --------------------------------------------------------
     # END PROJECT SPECIFIC MODEL LOGIC
     # --------------------------------------------------------
