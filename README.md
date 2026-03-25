@@ -181,7 +181,52 @@ The full machine learning pipeline will eventually be executable through:
 4.⁠ ⁠orchestrator:
 `python -m src.main`
 
-## 6. Generated outputs
+
+## 6. API Access (Live Service)
+
+The model is deployed as a live FastAPI service.
+
+###  Swagger UI
+https://my-project1-mlops.onrender.com/docs
+
+Use this interface to test the API interactively.
+
+---
+
+### Endpoints
+
+#### Health Check
+GET /health
+
+Returns:
+- service status
+- model_loaded flag
+- model version
+
+---
+
+#### Prediction
+POST /predict
+
+Example request:
+{
+  "records": [
+    {
+      "Id": 1,
+      "LotArea": 8450,
+      "GrLivArea": 1710,
+      "Neighborhood": "CollgCr",
+      "OverallQual": 7,
+      "YearBuilt": 2003
+    }
+  ]
+}
+
+Returns:
+- predicted SalePrice
+- model version
+
+## 7. Generated outputs
 
 1.⁠ ⁠data/processed/clean.csv: The deterministically cleaned input data
 
@@ -342,7 +387,7 @@ Estimated pilot budget: **$60k – $120k**
 
 ---
 
-## 7. Model Card
+## 8. Model Card
 
 | Field | Details |
 |---|---|
@@ -362,7 +407,7 @@ Estimated pilot budget: **$60k – $120k**
 
 ---
 
-## 8. Changelog
+## 9. Changelog
 
 ### v1.0.0 — 2026-03-22
 - Initial production release
