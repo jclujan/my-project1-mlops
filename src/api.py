@@ -282,19 +282,9 @@ def health() -> HealthResponse:
     model_loaded  = getattr(app.state, "model_pipeline", None) is not None
     model_version = getattr(app.state, "model_version", "unloaded")
 
-    if not model_loaded:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "status":        "model_not_loaded",
-                "model_loaded":  False,
-                "model_version": model_version,
-            },
-        )
-
     return HealthResponse(
         status="ok",
-        model_loaded=True,
+        model_loaded=model_loaded,
         model_version=model_version,
     )
 
