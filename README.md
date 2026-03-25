@@ -149,11 +149,13 @@ This project follows a strict separation between experimental work, production c
 │
 ├── src/                       # Production pipeline (core ML system)
 │   ├── __init__.py            # Makes src a Python package
+│   ├── api.py                 # FastAPI service — /health and /predict endpoints
 │   ├── clean_data.py          # Data preprocessing & feature preparation
 │   ├── evaluate.py            # Model evaluation and metrics handling
 │   ├── features.py            # Feature engineering utilities
 │   ├── infer.py               # Inference logic (prediction on new data)
 │   ├── load_data.py           # Data loading utilities
+│   ├── logger.py              # Dual-output logging (console + file)
 │   ├── main.py                # Pipeline orchestrator (training workflow)
 │   ├── train.py               # Model training logic
 │   ├── utils.py               # Helper utilities (e.g., path handling)
