@@ -81,6 +81,8 @@ def test_main_happy_path_writes_artifacts(tmp_path: Path, monkeypatch: pytest.Mo
             "n_bins": 3,
         },
         "train": {"test_size": 0.25, "random_state": 0},
+        "logging": {"level": "WARNING", "log_file": str(tmp_path / "logs" / "pipeline.log")},
+        "wandb": {"project": "test-project", "model_artifact_name": "test-model"},
     }
 
     def fake_load_config(*_args, **_kwargs):
@@ -134,6 +136,17 @@ def test_main_happy_path_writes_artifacts(tmp_path: Path, monkeypatch: pytest.Mo
     def fake_joblib_dump(obj, path: Path):
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         Path(path).write_bytes(b"artifact")
+
+    # Mock wandb so no real W&B connection is needed
+    import unittest.mock as mock
+    fake_run = mock.MagicMock()
+    fake_run.__enter__ = lambda s: s
+    fake_run.__exit__ = mock.MagicMock(return_value=False)
+    monkeypatch.setattr(m.wandb, "init", mock.MagicMock(return_value=fake_run))
+    monkeypatch.setattr(m.wandb, "log", mock.MagicMock())
+    monkeypatch.setattr(m.wandb, "Artifact", mock.MagicMock())
+    monkeypatch.setattr(m.wandb, "finish", mock.MagicMock())
+    monkeypatch.setattr(m.wandb, "run", fake_run)
 
     monkeypatch.setattr(m, "load_config", fake_load_config)
     monkeypatch.setattr(m, "load_dataset", fake_load_dataset)

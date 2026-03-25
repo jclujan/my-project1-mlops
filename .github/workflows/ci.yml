@@ -1,0 +1,41 @@
+name: MLOps Quality Gate
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  ci-test-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    env:
+      WANDB_MODE: disabled
+      MODEL_SOURCE: local
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-activate-base: true
+
+      - name: Install conda-lock
+        shell: bash -l {0}
+        run: conda install -n base -c conda-forge conda-lock -y
+
+      - name: Create exact environment with conda-lock
+        shell: bash -l {0}
+        run: conda run -n base python -m conda_lock install --name mlops_project conda-lock.yml
+
+      - name: Run pytest
+        shell: bash -l {0}
+        run: conda run -n mlops_project pytest -q
+
+      - name: Validate Docker build
+        run: docker build -t house-price-api:test .

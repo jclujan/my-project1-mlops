@@ -6,9 +6,13 @@ Input: Trained Model + Test Data.
 Output: Metrics dictionary and plots saved to `reports/`.
 """
 
+import logging
 from typing import Dict, Union
+
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 ArrayLike = Union[np.ndarray, pd.Series, list]
@@ -41,7 +45,7 @@ def evaluate_regression(y_true: ArrayLike, y_pred: ArrayLike, *, compute_rmsle: 
     Why this contract matters:
     - Standard metrics allow reliable comparisons between models/runs and catch regressions early.
     """
-    print("[evaluate.evaluate_regression] Evaluating predictions")  # TODO: replace with logging later
+    logger.info("Evaluating predictions")
 
     y_true_arr = _to_1d_array(y_true, "y_true")
     y_pred_arr = _to_1d_array(y_pred, "y_pred")
@@ -80,13 +84,13 @@ def evaluate_regression(y_true: ArrayLike, y_pred: ArrayLike, *, compute_rmsle: 
     # Optional RMSLE (useful for SalePrice; requires positives)
     if compute_rmsle:
         if (y_true_arr <= 0).any() or (y_pred_arr <= 0).any():
-            print("[evaluate.evaluate_regression] Skipping RMSLE: requires y_true>0 and y_pred>0")
+            logger.warning("Skipping RMSLE: requires y_true>0 and y_pred>0")
         else:
             log_true = np.log1p(y_true_arr)
             log_pred = np.log1p(y_pred_arr)
             rmsle = float(np.sqrt(np.mean((log_true - log_pred) ** 2)))
             metrics["rmsle"] = rmsle
 
-    print(f"[evaluate.evaluate_regression] Metrics: {metrics}")
+    logger.info("Metrics: %s", metrics)
     return metrics
 

@@ -1,0 +1,38 @@
+# ── Development and testing ───────────────────────
+tests/
+notebook/
+.github/
+
+# ── Data and outputs — not needed in serving image ─
+data/
+reports/
+logs/
+
+# ── W&B local cache ───────────────────────────────
+wandb/
+
+# ── Python cache ──────────────────────────────────
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+
+# ── Environments ──────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Secrets — never in the image ──────────────────
+.env
+
+# ── OS and IDE ────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Git ───────────────────────────────────────────
+.git/
+.gitignore
