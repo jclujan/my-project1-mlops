@@ -25,11 +25,13 @@ jobs:
         with:
           auto-activate-base: true
 
-      - name: Install conda-lock and create exact environment
+      - name: Install conda-lock
         shell: bash -el {0}
-        run: |
-          conda install -n base -c conda-forge conda-lock -y
-          conda-lock install --name mlops_project conda-lock.yml
+        run: conda install -n base -c conda-forge conda-lock -y
+
+      - name: Create exact environment with conda-lock
+        shell: bash -el {0}
+        run: conda-lock install --name mlops_project conda-lock.yml
 
       - name: Run pytest
         shell: bash -el {0}
