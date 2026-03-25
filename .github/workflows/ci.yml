@@ -26,18 +26,16 @@ jobs:
           auto-activate-base: true
 
       - name: Install conda-lock
-        shell: bash -el {0}
+        shell: bash -l {0}
         run: conda install -n base -c conda-forge conda-lock -y
 
       - name: Create exact environment with conda-lock
-        shell: bash -el {0}
-        run: conda-lock install --name mlops_project conda-lock.yml
+        shell: bash -l {0}
+        run: conda run -n base python -m conda_lock install --name mlops_project conda-lock.yml
 
       - name: Run pytest
-        shell: bash -el {0}
-        run: |
-          conda activate mlops_project
-          pytest -q
+        shell: bash -l {0}
+        run: conda run -n mlops_project pytest -q
 
       - name: Validate Docker build
         run: docker build -t house-price-api:test .
