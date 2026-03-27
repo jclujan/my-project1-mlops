@@ -157,6 +157,17 @@ def main() -> None:
         df_clean_materialized[target_column] = y_all.values
         df_clean_materialized.to_csv(clean_out_path, index=False)
 
+
+        # Log cleaned dataset to W&B
+        artifact_data = wandb.Artifact(
+            name="clean-data",
+            type="dataset",
+            description="Cleaned training dataset"
+        )
+        artifact_data.add_file(str(clean_out_path))
+        run.log_artifact(artifact_data)
+        logger.info("[main] Clean dataset logged to W&B")
+
         # ------------------------------------------------------------------
         # 3) Validate (fail fast)
         # ------------------------------------------------------------------
@@ -302,6 +313,16 @@ def main() -> None:
         preds_df.to_csv(preds_out_path, index=False)
         logger.info("[main] Saved predictions → %s", preds_out_path)
 
+        # Log predictions to W&B
+        artifact_preds = wandb.Artifact(
+            name="predictions",
+            type="dataset",
+            description="Model predictions output"
+        )
+        artifact_preds.add_file(str(preds_out_path))
+        run.log_artifact(artifact_preds)
+
+        logger.info("[main] Predictions logged to W&B")
         logger.info("[main] Pipeline finished successfully")
 
     except Exception:
